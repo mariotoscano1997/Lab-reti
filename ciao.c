@@ -24,22 +24,24 @@ int main( int argc , char** argv){
 		memset(&locale,0,sizeof(locale));
 		locale.sin_family= AF_INET;
 		locale.sin_addr.s_addr=htonl(INADDR_ANY);
-		locale.sin_port=htons(atoi(argv[1]));
+		locale.sin_port=htons(atoi(argv[2]));
 		if(bind(sockfd,(struct sockaddr*)&locale, sizeof(locale))<0){
 			printf("errore nel bind\n");
 			return 3;
 			}
 		while(1){
 			printf("server in attesa\n");
-			recvfrom(sockfd, msg, 81, 0, (struct sockaddr *)&sender, &len);
-			}
+			n=recvfrom(sockfd, msg, 81, 0, (struct sockaddr *)&sender, &len);
+			msg[n]=0;
+			printf("Messaggio da %s : %s", inet_ntoa(sender.sin_addr), msg);	
 		}
-	}
+		}
+	
 	else {
 		int sockfd, n;
 		extern int errno;
 		struct sockaddr_in locale, reciver;
-		socklen_t len= sizeof(sender);
+		socklen_t len= sizeof(reciver);
 		char msg[81];
 
 		if(argc<3) { printf("inserire indirizzo porta\n"); return 0;}
@@ -54,7 +56,7 @@ int main( int argc , char** argv){
 		
 		while(fgets(msg,81,stdin)!=NULL){
 			printf("invio dati\n");
-			sendto(sockfd, msg, 81, 0, (struct sockaddr *)&sender, len);
+			sendto(sockfd, msg, 81, 0, (struct sockaddr *)&reciver, len);
 		}
 	}
 }
